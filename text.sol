@@ -5,20 +5,25 @@ contract TicTacToe{
         address public player1;
         address public player2;
         bool public flag=false;
+        int public move_flag;
         int total_move;
+        mapping(address => int) addr_to_id;
         function TicTacToe()
         {
             player1 = msg.sender;
+            addr_to_id[msg.sender]=1;
             for(uint i=0;i<9;i++)
             {
                 board[i]=-1;
             }
             total_move=0;
+            move_flag=1;
         }
         
         function register_player()
         {
             player2=msg.sender;
+            addr_to_id[msg.sender]=2;
             flag=true;
         }
         function check_state(int val) returns(int)
@@ -63,8 +68,9 @@ contract TicTacToe{
         function update_board(int val,uint place) returns(bool)
         {
             int x=board[place];
-            if(val!=0 || val!=1)
+            if(val<1 || val>2)
                 return false;
+            
             if(x==-1 && flag==true)
             {
                 board[place]=val;
@@ -76,9 +82,18 @@ contract TicTacToe{
         }
         function move(int val,uint place) returns(string)
         {
-            if(update_board(val,place))
+            int temp=addr_to_id[msg.sender];
+            if(temp==val && move_flag==val && update_board(val,place))
             {
                 total_move++;
+                if(move_flag==1)
+                {
+                    move_flag=2;
+                }
+                else
+                {
+                    move_flag=1;
+                }
                 int x=check_state(val);
                 if(x==0)
                 {
